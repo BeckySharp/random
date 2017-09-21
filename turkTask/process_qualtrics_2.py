@@ -3,15 +3,13 @@ from __future__ import division
 
 import sys
 
-args = sys.argv
+survey_number = "0"
 
-print "Args provided:" + str(args)
-
-filename = args[1]
+filename = "/lhome/bsharp/wmseed_laptop/wmseed/mainTask/AdjectiveMainTurkTask{0}.tsv".format(survey_number)
 fi = open(filename, 'r')
 fo = open(filename + ".R.csv", 'w')
 
-adjectives_file = args[2]
+adjectives_file = "/lhome/bsharp/wmseed_laptop/wmseed/mainTask/adj_main_{0}.txt".format(survey_number)
 adjectives = [adj_line.rstrip() for adj_line in open(adjectives_file, 'r').readlines()]
 print adjectives
 
