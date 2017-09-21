@@ -34,7 +34,7 @@ for line in fi:
         two_devs = fields[22::4]
         means = fields[23::4]
         upper_bounds = fields[24::4]
-        assert (len(lower_bounds) == len(means) == len(upper_bounds) == len(two_devs) == len(adjectives)) == True
+        #assert (len(lower_bounds) == len(means) == len(upper_bounds) == len(two_devs) == len(adjectives)) == True
         for i in range(len(adjectives)):
             adj = adjectives[i]
             resp = float(question_responses[i])
@@ -47,7 +47,8 @@ for line in fi:
             print "LB: ", lower_bounds[i]
             print "UB: ", upper_bounds[i]
             to_write = [turker, adj, resp, mu, sigma, respDev]
-            # fo.write()
+            as_string = [str(item) for item in to_write]
+            fo.write(",".join(as_string) + "\n")
 
     # for f in fields:
     #     print f
