@@ -1,0 +1,625 @@
+#-----------------------------------------
+# Setup
+#-----------------------------------------
+
+library(lme4)
+library(ggplot2)
+library(MuMIn)
+
+# Function for the R^2 — BUT I don’t think it fully takes mixed effects into acc…
+my_rsq <- function (x, y) cor(x, y) ^ 2
+
+m = read.csv("/lhome/bsharp/github/random/turkTask/AdjMainR.csv") 
+
+
+#-----------------------------------------
+# Outlier removal by adjective
+#-----------------------------------------
+
+relative = subset(m, m$adjective == "relative")
+outlierKD(relative, respdev)
+little = subset(m, m$adjective == "little")
+outlierKD(little, respdev)
+big = subset(m, m$adjective == "big")
+outlierKD(big, respdev)
+favorable = subset(m, m$adjective == "favorable")
+outlierKD(favorable, respdev)
+legitimate = subset(m, m$adjective == "legitimate")
+outlierKD(legitimate, respdev)
+sizable = subset(m, m$adjective == "sizable")
+outlierKD(sizable, respdev)
+tiny = subset(m, m$adjective == "tiny")
+outlierKD(tiny, respdev)
+extraordinary = subset(m, m$adjective == "extraordinary")
+outlierKD(extraordinary, respdev)
+weak = subset(m, m$adjective == "weak")
+outlierKD(weak, respdev)
+striking = subset(m, m$adjective == "striking")
+outlierKD(striking, respdev)
+rich = subset(m, m$adjective == "rich")
+outlierKD(rich, respdev)
+dramatic = subset(m, m$adjective == "dramatic")
+outlierKD(dramatic, respdev)
+fine = subset(m, m$adjective == "fine")
+outlierKD(fine, respdev)
+modest = subset(m, m$adjective == "modest")
+outlierKD(modest, respdev)
+important = subset(m, m$adjective == "important")
+outlierKD(important, respdev)
+unlikely = subset(m, m$adjective == "unlikely")
+outlierKD(unlikely, respdev)
+prominent = subset(m, m$adjective == "prominent")
+outlierKD(prominent, respdev)
+competitive = subset(m, m$adjective == "competitive")
+outlierKD(competitive, respdev)
+good = subset(m, m$adjective == "good")
+outlierKD(good, respdev)
+critical = subset(m, m$adjective == "critical")
+outlierKD(critical, respdev)
+sensitive = subset(m, m$adjective == "sensitive")
+outlierKD(sensitive, respdev)
+narrow = subset(m, m$adjective == "narrow")
+outlierKD(narrow, respdev)
+rare = subset(m, m$adjective == "rare")
+outlierKD(rare, respdev)
+generous = subset(m, m$adjective == "generous")
+outlierKD(generous, respdev)
+outstanding = subset(m, m$adjective == "outstanding")
+outlierKD(outstanding, respdev)
+considerable = subset(m, m$adjective == "considerable")
+outlierKD(considerable, respdev)
+typical = subset(m, m$adjective == "typical")
+outlierKD(typical, respdev)
+promising = subset(m, m$adjective == "promising")
+outlierKD(promising, respdev)
+normal = subset(m, m$adjective == "normal")
+outlierKD(normal, respdev)
+broad = subset(m, m$adjective == "broad")
+outlierKD(broad, respdev)
+light = subset(m, m$adjective == "light")
+outlierKD(light, respdev)
+powerful = subset(m, m$adjective == "powerful")
+outlierKD(powerful, respdev)
+high = subset(m, m$adjective == "high")
+outlierKD(high, respdev)
+huge = subset(m, m$adjective == "huge")
+outlierKD(huge, respdev)
+disappointing = subset(m, m$adjective == "disappointing")
+outlierKD(disappointing, respdev)
+traditional = subset(m, m$adjective == "traditional")
+outlierKD(traditional, respdev)
+serious = subset(m, m$adjective == "serious")
+outlierKD(serious, respdev)
+sound = subset(m, m$adjective == "sound")
+outlierKD(sound, respdev)
+grand = subset(m, m$adjective == "grand")
+outlierKD(grand, respdev)
+minor = subset(m, m$adjective == "minor")
+outlierKD(minor, respdev)
+remarkable = subset(m, m$adjective == "remarkable")
+outlierKD(remarkable, respdev)
+aggressive = subset(m, m$adjective == "aggressive")
+outlierKD(aggressive, respdev)
+usual = subset(m, m$adjective == "usual")
+outlierKD(usual, respdev)
+low = subset(m, m$adjective == "low")
+outlierKD(low, respdev)
+great = subset(m, m$adjective == "great")
+outlierKD(great, respdev)
+steep = subset(m, m$adjective == "steep")
+outlierKD(steep, respdev)
+sharp = subset(m, m$adjective == "sharp")
+outlierKD(sharp, respdev)
+slight = subset(m, m$adjective == "slight")
+outlierKD(slight, respdev)
+firm = subset(m, m$adjective == "firm")
+outlierKD(firm, respdev)
+obvious = subset(m, m$adjective == "obvious")
+outlierKD(obvious, respdev)
+tight = subset(m, m$adjective == "tight")
+outlierKD(tight, respdev)
+major = subset(m, m$adjective == "major")
+outlierKD(major, respdev)
+poor = subset(m, m$adjective == "poor")
+outlierKD(poor, respdev)
+clear = subset(m, m$adjective == "clear")
+outlierKD(clear, respdev)
+appropriate = subset(m, m$adjective == "appropriate")
+outlierKD(appropriate, respdev)
+small = subset(m, m$adjective == "small")
+outlierKD(small, respdev)
+thin = subset(m, m$adjective == "thin")
+outlierKD(thin, respdev)
+adequate = subset(m, m$adjective == "adequate")
+outlierKD(adequate, respdev)
+positive = subset(m, m$adjective == "positive")
+outlierKD(positive, respdev)
+substantial = subset(m, m$adjective == "substantial")
+outlierKD(substantial, respdev)
+impressive = subset(m, m$adjective == "impressive")
+outlierKD(impressive, respdev)
+large = subset(m, m$adjective == "large")
+outlierKD(large, respdev)
+fair = subset(m, m$adjective == "fair")
+outlierKD(fair, respdev)
+intense = subset(m, m$adjective == "intense")
+outlierKD(intense, respdev)
+unexpected = subset(m, m$adjective == "unexpected")
+outlierKD(unexpected, respdev)
+deep = subset(m, m$adjective == "deep")
+outlierKD(deep, respdev)
+fundamental = subset(m, m$adjective == "fundamental")
+outlierKD(fundamental, respdev)
+regular = subset(m, m$adjective == "regular")
+outlierKD(regular, respdev)
+surprising = subset(m, m$adjective == "surprising")
+outlierKD(surprising, respdev)
+stable = subset(m, m$adjective == "stable")
+outlierKD(stable, respdev)
+bullish = subset(m, m$adjective == "bullish")
+outlierKD(bullish, respdev)
+severe = subset(m, m$adjective == "severe")
+outlierKD(severe, respdev)
+healthy = subset(m, m$adjective == "healthy")
+outlierKD(healthy, respdev)
+bearish = subset(m, m$adjective == "bearish")
+outlierKD(bearish, respdev)
+reasonable = subset(m, m$adjective == "reasonable")
+outlierKD(reasonable, respdev)
+comfortable = subset(m, m$adjective == "comfortable")
+outlierKD(comfortable, respdev)
+hefty = subset(m, m$adjective == "hefty")
+outlierKD(hefty, respdev)
+inadequate = subset(m, m$adjective == "inadequate")
+outlierKD(inadequate, respdev)
+wide = subset(m, m$adjective == "wide")
+outlierKD(wide, respdev)
+excessive = subset(m, m$adjective == "excessive")
+outlierKD(excessive, respdev)
+valuable = subset(m, m$adjective == "valuable")
+outlierKD(valuable, respdev)
+conventional = subset(m, m$adjective == "conventional")
+outlierKD(conventional, respdev)
+ordinary = subset(m, m$adjective == "ordinary")
+outlierKD(ordinary, respdev)
+solid = subset(m, m$adjective == "solid")
+outlierKD(solid, respdev)
+nice = subset(m, m$adjective == "nice")
+outlierKD(nice, respdev)
+moderate = subset(m, m$adjective == "moderate")
+outlierKD(moderate, respdev)
+radical = subset(m, m$adjective == "radical")
+outlierKD(radical, respdev)
+likely = subset(m, m$adjective == "likely")
+outlierKD(likely, respdev)
+extensive = subset(m, m$adjective == "extensive")
+outlierKD(extensive, respdev)
+unusual = subset(m, m$adjective == "unusual")
+outlierKD(unusual, respdev)
+liberal = subset(m, m$adjective == "liberal")
+outlierKD(liberal, respdev)
+crucial = subset(m, m$adjective == "crucial")
+outlierKD(crucial, respdev)
+vital = subset(m, m$adjective == "vital")
+outlierKD(vital, respdev)
+strong = subset(m, m$adjective == "strong")
+outlierKD(strong, respdev)
+impossible = subset(m, m$adjective == "impossible")
+outlierKD(impossible, respdev)
+routine = subset(m, m$adjective == "routine")
+outlierKD(routine, respdev)
+acceptable = subset(m, m$adjective == "acceptable")
+outlierKD(acceptable, respdev)
+significant = subset(m, m$adjective == "significant")
+outlierKD(significant, respdev)
+conservative = subset(m, m$adjective == "conservative")
+outlierKD(conservative, respdev)
+familiar = subset(m, m$adjective == "familiar")
+outlierKD(familiar, respdev)
+rd = rbind(relative, little, big, favorable, legitimate, sizable, tiny, extraordinary, weak, striking, rich, dramatic, fine, modest, important, unlikely, prominent, competitive, good, critical, sensitive, narrow, rare, generous, outstanding, considerable, typical, promising, normal, broad, light, powerful, high, huge, disappointing, traditional, serious, sound, grand, minor, remarkable, aggressive, usual, low, great, steep, sharp, slight, firm, obvious, tight, major, poor, clear, appropriate, small, thin, adequate, positive, substantial, impressive, large, fair, intense, unexpected, deep, fundamental, regular, surprising, stable, bullish, severe, healthy, bearish, reasonable, comfortable, hefty, inadequate, wide, excessive, valuable, conventional, ordinary, solid, nice, moderate, radical, likely, extensive, unusual, liberal, crucial, vital, strong, impossible, routine, acceptable, significant, conservative, familiar)
+
+# Remove unreliable turkers (more than 50% of their responses were removed as outliers)
+rd2 = subset(rd, rd$turker != "T_121936")
+rd2 = subset(rd2, rd2$turker != "T_1298416")
+rd2 = subset(rd2, rd2$turker != "T_2115504")
+rd2 = subset(rd2, rd2$turker != "T_2153811")
+rd2 = subset(rd2, rd2$turker != "T_2892459")
+rd2 = subset(rd2, rd2$turker != "T_3492478")
+rd2 = subset(rd2, rd2$turker != "T_39282")
+rd2 = subset(rd2, rd2$turker != "T_4014221")
+rd2 = subset(rd2, rd2$turker != "T_6891188")
+rd2 = subset(rd2, rd2$turker != "T_9330037")
+# now 4760 rows
+
+# if I get rid of ppl first, then run outliers, there are 4318 data points
+
+#-----------------------------------------
+# Basic Model
+#-----------------------------------------
+
+modelrd = lmer(respdev ~ adjective
+			 + mean
+			 + onestdev
+             +(1|turker), # random slope(right?) for each turk respondent
+             data = rd2, REML = F)		
+modelrd
+summary(modelrd)
+
+*****************************
+> summary(modelrd)
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: respdev ~ adjective + mean + onestdev + (1 | turker)
+   Data: rd2
+
+     AIC      BIC   logLik deviance df.resid 
+   555.3    598.3   -266.7    533.3      356 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3583 -0.4953 -0.0554  0.3596  5.5304 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ turker   (Intercept) 0.1012   0.3181  
+ Residual             0.2266   0.4761  
+Number of obs: 367, groups:  turker, 15
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)        7.968e-01  1.306e-01   6.103
+adjectivecritical  1.212e+00  1.112e-01  10.901
+adjectivelow      -4.307e-01  1.055e-01  -4.081
+adjectivemajor     9.366e-01  9.807e-02   9.550
+adjectivepoor     -3.678e-01  1.086e-01  -3.386
+adjectivesmall    -4.309e-01  1.015e-01  -4.247
+adjectivestrong    7.462e-01  1.039e-01   7.182
+mean               1.483e-06  8.343e-07   1.778
+onestdev          -8.685e-05  2.672e-05  -3.251
+
+Correlation of Fixed Effects:
+            (Intr) adjctvc adjctvl adjctvm adjctvp adjctvsm adjctvst mean  
+adjctvcrtcl -0.611                                                         
+adjectivelw -0.572  0.618                                                  
+adjectivmjr -0.500  0.559   0.561                                          
+adjectivepr -0.606  0.628   0.606   0.549                                  
+adjectvsmll -0.544  0.587   0.583   0.549   0.585                          
+adjctvstrng -0.578  0.627   0.616   0.571   0.610   0.589                  
+mean        -0.251  0.138   0.040  -0.004   0.194   0.068    0.031         
+onestdev    -0.511  0.503   0.459   0.298   0.458   0.368    0.460   -0.064
+fit warnings:
+Some predictor variables are on very different scales: consider rescaling
+*****************************
+
+
+r.squaredGLMM(modelrd)
+
+*****************************
+      R2m       R2c 
+0.5808253 0.7102161 
+*****************************
+
+
+
+modelrd_slopeAdj = lmer(respdev ~ adjective
+ 			 + mean
+ 			 + onestdev
+              +(1+adjective|turker), # random slope(right?) for each turk respondent
+              data = rd2, REML = F)		
+
+modelrd_slopeAdj
+*****************************
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: respdev ~ adjective + mean + onestdev + (1 + adjective | turker)
+   Data: rd2
+      AIC       BIC    logLik  deviance  df.resid 
+ 539.0304  687.4341 -231.5152  463.0304       329 
+Random effects:
+ Groups   Name              Std.Dev. Corr                               
+ turker   (Intercept)       0.1166                                      
+          adjectivecritical 0.8146    0.46                              
+          adjectivelow      0.1349   -0.41  0.59                        
+          adjectivemajor    0.2613    0.93  0.67 -0.09                  
+          adjectivepoor     0.1858   -0.59  0.40  0.85 -0.42            
+          adjectivesmall    0.1247   -0.41  0.62  0.98 -0.14  0.93      
+          adjectivestrong   0.2770    0.60  0.78  0.12  0.57  0.24  0.27
+ Residual                   0.4150                                      
+Number of obs: 367, groups:  turker, 15
+Fixed Effects:
+      (Intercept)  adjectivecritical       adjectivelow     adjectivemajor  
+        7.067e-01          1.447e+00         -4.053e-01          9.970e-01  
+    adjectivepoor     adjectivesmall    adjectivestrong               mean  
+       -3.498e-01         -4.170e-01          8.231e-01          1.853e-06  
+         onestdev  
+       -8.056e-05  
+fit warnings:
+Some predictor variables are on very different scales: consider rescaling
+*****************************
+
+summary(modelrd_slopeAdj)
+*****************************
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: respdev ~ adjective + mean + onestdev + (1 + adjective | turker)
+   Data: rd2
+
+     AIC      BIC   logLik deviance df.resid 
+   539.0    687.4   -231.5    463.0      329 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.1994 -0.4876 -0.0929  0.4471  4.2492 
+
+Random effects:
+ Groups   Name              Variance Std.Dev. Corr                               
+ turker   (Intercept)       0.01360  0.1166                                      
+          adjectivecritical 0.66358  0.8146    0.46                              
+          adjectivelow      0.01820  0.1349   -0.41  0.59                        
+          adjectivemajor    0.06827  0.2613    0.93  0.67 -0.09                  
+          adjectivepoor     0.03452  0.1858   -0.59  0.40  0.85 -0.42            
+          adjectivesmall    0.01556  0.1247   -0.41  0.62  0.98 -0.14  0.93      
+          adjectivestrong   0.07673  0.2770    0.60  0.78  0.12  0.57  0.24  0.27
+ Residual                   0.17222  0.4150                                      
+Number of obs: 367, groups:  turker, 15
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)        7.067e-01  9.283e-02   7.613
+adjectivecritical  1.447e+00  2.347e-01   6.164
+adjectivelow      -4.053e-01  9.868e-02  -4.108
+adjectivemajor     9.970e-01  1.091e-01   9.140
+adjectivepoor     -3.498e-01  1.066e-01  -3.280
+adjectivesmall    -4.170e-01  9.436e-02  -4.419
+adjectivestrong    8.231e-01  1.155e-01   7.125
+mean               1.853e-06  7.287e-07   2.543
+onestdev          -8.056e-05  2.320e-05  -3.472
+
+Correlation of Fixed Effects:
+            (Intr) adjctvc adjctvl adjctvm adjctvp adjctvsm adjctvst mean  
+adjctvcrtcl -0.169                                                         
+adjectivelw -0.701  0.429                                                  
+adjectivmjr -0.283  0.553   0.386                                          
+adjectivepr -0.748  0.392   0.642   0.261                                  
+adjectvsmll -0.672  0.419   0.633   0.371   0.636                          
+adjctvstrng -0.428  0.639   0.476   0.565   0.492   0.490                  
+mean        -0.308  0.068   0.038   0.001   0.175   0.066    0.028         
+onestdev    -0.622  0.199   0.430   0.225   0.407   0.346    0.356   -0.062
+fit warnings:
+Some predictor variables are on very different scales: consider rescaling
+*****************************
+
+r.squaredGLMM(modelrd_slopeAdj)
+*****************************
+      R2m       R2c 
+0.6205364 0.8020792
+*****************************
+
+
+#-----------------------------------------
+# Cross-Validate model
+#-----------------------------------------
+
+set.seed(101)
+sample <- sample.int(n = nrow(rd2), size = floor(.75*nrow(rd2)), replace = F)
+train_rd <- rd2[sample, ]
+test_rd  <- rd2[-sample, ]
+
+modelrd_train = lmer(respdev ~ adjective
+			 + mean
+			 + onestdev
+             +(1|turker), # random slope(right?) for each turk respondent
+             data = train_rd, REML = F)		
+modelrd_train
+summary(modelrd_train)
+
+r.squaredGLMM(modelrd_train)
+*****************************
+      R2m       R2c 
+0.6018689 0.6993606 
+*****************************
+
+predictions_rd_test = predict(modelrd_train, test_rd)
+
+my_rsq(predictions_rd_test, test_rd$respdev)
+## This is only a pseudo-R^2
+*****************************
+[1] 0.7007994
+*****************************
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# rmse from Metrics package:
+
+# RMSE for training
+>rmse(rd2$respdev, predict(modelrd, rd2))
+#[1] 0.4671313
+
+# RMSE for testing
+> rmse(test_rd$respdev, predict(modelrd_train, test_rd))
+#[1] 0.5218621
+
+## Predictive R2:
+# Predicted squared error (PSE):
+PSE = sum((test_rd$respdev - predictions_rd_test)^2) / nrow(test_rd)
+# [1] 0.27234
+
+SStot = sum((mean(rd2$respdev) - test_rd$respdev)^2) / nrow(test_rd)
+#[1] 0.888911
+
+1 - (PSE/SStot)
+#Predictive R2 = [1] 0.6936251
+
+> my_lme_cv(rd2)
+Loading required package: Matrix
+[1] 0.6775378
+
+
+## As a lm instead, using caret package LOOCV
+> train_control <- trainControl(method="LOOCV")
+> # train the model
+> model <- train(
++     respdev ~ adjective
++     + mean
++     + onestdev
++     #+(1|turker)
++     , data=rd2, trControl=train_control, method="lm")
+There were 50 or more warnings (use warnings() to see the first 50)
+> # summarize results
+> print(model)
+Linear Regression 
+
+367 samples
+  3 predictor
+
+No pre-processing
+Resampling: Leave-One-Out Cross-Validation 
+Summary of sample sizes: 366, 366, 366, 366, 366, 366, ... 
+Resampling results:
+
+  RMSE       Rsquared   MAE     
+  0.5553423  0.5981039  0.379189
+
+Tuning parameter 'intercept' was held constant at a value of TRUE
+################
+
+
+
+#-----------------------------------------
+# PLOTS
+#-----------------------------------------
+# Residual plot for all data:
+plot(modelrd, resid(., scaled=TRUE) ~ fitted(.) | adjective, abline = 0)
+
+# Boxplots
+p <- ggplot(n, aes(adjective, respdev))
+
+p + geom_boxplot(outlier.alpha = 0.1) + geom_jitter(width = 0.1) + ggtitle("Standardized Response by Adjective")
+
+p + geom_boxplot(outlier.alpha = 0.1)  + ggtitle("Standardized Response by Adjective")
+
+p + geom_boxplot(aes(group = cut_width(mean, 1)), outlier.alpha = 0.1) + geom_jitter(aes(group = cut_width(mean, 1)), width = 0.05) + ggtitle("Standardized Response by Adjective and PromptMean")
+
+p + geom_boxplot(aes(group = cut_width(onestdev, 1)), outlier.alpha = 0.1) + ggtitle("Standardized Response by Adjective and PromptStdDeviation")
+
+#-----------------------------------------
+# CV function
+#-----------------------------------------
+my_lme_cv <- function(dt) {
+	nrow(dt)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$respdev)
+	PRESS = 0
+	SD = 0
+	for (heldout in 1:nrow(dt)){
+		i
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+
+		modelcv_train = lmer(respdev ~ adjective
+  		 	+ mean
+	 		+ onestdev
+             		+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + ((sum(test$respdev) - ym)^2)
+	}
+	1-(PRESS/SD)	
+	
+}
+my_lme_cv <- function(dt) {
+	nrow(dt)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$respdev)
+	PRESS = 0
+	SD = 0
+	for (heldout in 1:nrow(dt)){
+		i
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+
+		modelcv_train = lmer(respdev ~ adjective
+  		 	+ mean
+	 		+ onestdev
+             		+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + ((sum(test$respdev) - ym)^2)
+	}
+	1-(PRESS/SD)	
+	
+}
+
+
+my_lme_cv <- function(dt) {
+	library(lme4)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$respdev)
+	PRESS = 0
+	SD = 0
+	for (heldout in 1:nrow(dt)){
+		i
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+
+		modelcv_train = lmer(respdev ~ adjective
+  		 	+ mean
+	 		+ onestdev
+             		+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + ((sum(test$respdev) - ym)^2)
+	}
+	cat("Predictive R^2 using LOOCV with lmer:")
+	cat("    respdev ~ adjective + mean + stdev + (1|turker) ")
+	
+	1-(PRESS/SD)	
+	
+}
+
+
+#-----------------------------------------
+# Outlier removal function
+#-----------------------------------------
+outlierKD <- function(dt, var) {
+     var_name <- eval(substitute(var),eval(dt))
+     na1 <- sum(is.na(var_name))
+     m1 <- mean(var_name, na.rm = T)
+     par(mfrow=c(2, 2), oma=c(0,0,3,0))
+     boxplot(var_name, main="With outliers")
+     hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+     outlier <- boxplot.stats(var_name)$out
+     mo <- mean(outlier)
+     var_name <- ifelse(var_name %in% outlier, NA, var_name)
+     boxplot(var_name, main="Without outliers")
+     hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+     title("Outlier Check", outer=TRUE)
+     na2 <- sum(is.na(var_name))
+     cat("Outliers identified:", na2 - na1, "n")
+     cat("Propotion (%) of outliers:", round((na2 - na1) / sum(!is.na(var_name))*100, 1), "n")
+     cat("Mean of the outliers:", round(mo, 2), "n")
+     m2 <- mean(var_name, na.rm = T)
+     cat("Mean without removing outliers:", round(m1, 2), "n")
+     cat("Mean if we remove outliers:", round(m2, 2), "n")
+     dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     #response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+     #if(response == "y" | response == "yes"){
+     #     dt[as.character(substitute(var))] <- invisible(var_name)
+     #     assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+     #     cat("Outliers successfully removed", "n")
+     #     return(invisible(dt))
+     #} else{
+     #     cat("Nothing changed", "n")
+     #     return(invisible(var_name))
+     #}
+}
+
