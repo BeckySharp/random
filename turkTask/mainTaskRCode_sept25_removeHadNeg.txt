@@ -490,11 +490,29 @@ modelrd_log_full_minus_stdevMean_minus_stdevAdj 199 7485.8 8700.6 -3543.9   7087
 modelrd_log_full_minus_stdevMean                296 7521.4 9328.3 -3464.7   6929.4 158.44     97  8.272e-05 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#——————————————————
 > r.squaredGLMM(modelrd_log_full)
       R2m       R2c 
 0.6466410 0.6952482
+Predictive R^2 using LOOCV with lmer:    logrespdev ~ adjective + mean + stdev + adj:mean + adj:stdev  (1|turker) [1] 0.6149629
+Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + adj:mean + (1|turker) [1] 0.6024396
+Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + (1|turker) [1] 0.6139743
 
 
+#——————————————————
+
+
+##BACKOFF!!###
+
+> anova(modelrd_backoff_full_log, modelrd_backoff_log_minusInteraction)
+Data: rd4
+Models:
+modelrd_backoff_log_minusInteraction: logrespdev ~ adjective + mean + (1 | turker)
+modelrd_backoff_full_log: logrespdev ~ adjective + mean + mean:adjective + (1 | turker)
+                                      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)
+modelrd_backoff_log_minusInteraction 101 7557.1 8173.6 -3677.6   7355.1                         
+modelrd_backoff_full_log             198 7643.5 8852.2 -3623.8   7247.5 107.58     97     0.2173
 
 
 #-----------------------------------------
@@ -715,6 +733,42 @@ my_lme_cv_backoff <- function(dt) {
 	1-(PRESS/SD)	
 	
 }
+
+my_lme_cv_log_backoff <- function(dt) {
+	library(lme4)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$logrespdev)
+	PRESS = 0
+	SD = 0
+  
+	for (heldout in 1:nrow(dt)){
+		cat("Working on heldout = ")
+  	cat(heldout)
+    	cat("\n")
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+	
+		modelcv_train = lmer(logrespdev ~ adjective
+  		 	+ mean
+	 		#+ onestdev
+			+ mean:adjective #+ onestdev:adjective 
+             		+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$logrespdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + sum((test$logrespdev - ym)^2)
+	}
+	cat("Predictive R^2 using LOOCV with lmer (BACKOFF!):")
+	cat("    logrespdev ~ adjective + mean + adj:mean + (1|turker) ")
+	
+	1-(PRESS/SD)	
+	
+}
+
+
+
 
 #-----------------------------------------
 # Outlier removal function
