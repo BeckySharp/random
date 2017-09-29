@@ -9,7 +9,7 @@ library(MuMIn)
 # Function for the R^2 — BUT I don’t think it fully takes mixed effects into acc…
 my_rsq <- function (x, y) cor(x, y) ^ 2
 
-m = read.csv("/lhome/bsharp/github/random/turkTask/AdjMainR.csv") 
+m = read.csv("/Users/bsharp/github/random/turkTask/AdjMainR.csv")
 #nrow(m) == 4960
 
 #-----------------------------------------
@@ -56,6 +56,13 @@ rd2 = subset(rd2, rd2$turker != "T_4606060")
 rd2 = subset(rd2, rd2$turker != "T_6842232")
 rd2 = subset(rd2, rd2$turker != "T_947851")
 # nrow(rd2) == 4420 rows
+
+
+#-----------------------------------------
+# Remove negatives (50% or more of their responses were identical to given range endpoint)
+#-----------------------------------------
+rd2 = subset(rd2, rd2$had_negative != "hadNeg")
+
 
 
 
@@ -272,11 +279,36 @@ rd = subset(rd, rd$adjective!="unlikely")
 (data very different from the rest)
 
 rd2 = subset(rd, rd$respdev!="NA")
-nrow(rd2) == 3924
+nrow(rd2) # get rid of hadNegs first, then outliers
+#[1] 3352
+
+#-----------------------------------------
+# Remove turkers with 4 or fewer left (so we can use turker as a random effect)
+#-----------------------------------------
 
 
-nrow(rd4) # get rid of hadNegs first, then outliers
-[1] 3352
+rd2 = subset(rd2, rd2$turker != "T_1637507")
+rd2 = subset(rd2, rd2$turker != "T_1693338")#
+rd2 = subset(rd2, rd2$turker != "T_210456")#     2
+rd2 = subset(rd2, rd2$turker != "T_290956")#     1
+rd2 = subset(rd2, rd2$turker != "T_3166001")#    1
+rd2 = subset(rd2, rd2$turker != "T_3763769")#    1
+rd2 = subset(rd2, rd2$turker != "T_4675580")#    2
+rd2 = subset(rd2, rd2$turker != "T_5041464")#    2
+rd2 = subset(rd2, rd2$turker != "T_5139008")#    1
+rd2 = subset(rd2, rd2$turker != "T_5341965")#    1
+rd2 = subset(rd2, rd2$turker != "T_5656483")#    1
+rd2 = subset(rd2, rd2$turker != "T_6630007")#    2
+rd2 = subset(rd2, rd2$turker != "T_7020912")#    1
+rd2 = subset(rd2, rd2$turker != "T_8155329")#    1
+rd2 = subset(rd2, rd2$turker != "T_8417097")#    3
+rd2 = subset(rd2, rd2$turker != "T_883092")#    1
+rd2 = subset(rd2, rd2$turker != "T_9136402")#    2
+rd2 = subset(rd2, rd2$turker != "T_9884243")#    2
+
+nrow(rd2)
+# [1] 3326
+
 
 #-----------------------------------------
 # Basic Model
@@ -296,8 +328,17 @@ r.squaredGLMM(modelrd_full)
 
 *****************************
       R2m       R2c 
-0.5925816 0.6692958 
+0.5941554 0.6692609
 *****************************
+
+(With 3326 rd2)
+Predictive R^2 using LOOCV with lmer:    respdev ~ adjective + mean + stdev + (1|turker) [1] 0.5865429
+Predictive R^2 using LOOCV with lmer:    respdev ~ adjective + mean + stdev + adj:mean + adj:stdev + mean:stdev (1|turker) [1] 0.5692041
+
+BACKOFF:
+Predictive R^2 using LOOCV with lmer:    respdev ~ adjective + mean + mean:adjective + (1|turker) [1] 0.5590469
+*****************************
+
 
 > r.squaredGLMM(modelrd_full4)
       R2m       R2c 
@@ -319,12 +360,9 @@ modelrd_full_minus_stdevMean: respdev ~ adjective + onestdev + mean + onestdev:a
 modelrd_full_minus_stdevMean:     mean:adjective + (1 | turker)
 modelrd_full: respdev ~ adjective + onestdev + mean + onestdev:adjective + 
 modelrd_full:     mean:adjective + onestdev:mean + (1 | turker)
-                              Df    AIC    BIC  logLik deviance  Chisq
-modelrd_full_minus_stdevMean 296 5336.3 7147.0 -2372.1   4744.3       
-modelrd_full                 297 5332.2 7149.1 -2369.1   4738.2 6.0046
-                             Chi Df Pr(>Chisq)  
-modelrd_full_minus_stdevMean                    
-modelrd_full                      1    0.01427 *
+                              Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
+modelrd_full_minus_stdevMean 296 5285.4 7093.8 -2346.7   4693.4                           
+modelrd_full                 297 5281.4 7095.9 -2343.7   4687.4 5.9649      1    0.01459 *
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
@@ -339,19 +377,16 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
                      data = rd2, REML = F)		
 Warning message:
 Some predictor variables are on very different scales: consider rescaling 
-> 
-> Data: rd2
+> anova(modelrd_full, modelrd_full_minus_meanAdj) 
+Data: rd2
 Models:
 modelrd_full_minus_meanAdj: respdev ~ adjective + onestdev + mean + onestdev:adjective + 
 modelrd_full_minus_meanAdj:     onestdev:mean + (1 | turker)
 modelrd_full: respdev ~ adjective + onestdev + mean + onestdev:adjective + 
 modelrd_full:     mean:adjective + onestdev:mean + (1 | turker)
-                            Df    AIC    BIC  logLik deviance  Chisq
-modelrd_full_minus_meanAdj 200 5314.9 6538.4 -2457.5   4914.9       
-modelrd_full               297 5332.2 7149.1 -2369.1   4738.2 176.68
-                           Chi Df Pr(>Chisq)    
-modelrd_full_minus_meanAdj                      
-modelrd_full                   97  1.409e-06 ***
+                            Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)    
+modelrd_full_minus_meanAdj 200 5266.1 6488.0 -2433.1   4866.1                             
+modelrd_full               297 5281.4 7095.9 -2343.7   4687.4 178.71     97  8.683e-07 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
@@ -374,15 +409,90 @@ modelrd_full_minus_stdevAdj: respdev ~ adjective + onestdev + mean + mean:adject
 modelrd_full_minus_stdevAdj:     (1 | turker)
 modelrd_full: respdev ~ adjective + onestdev + mean + onestdev:adjective + 
 modelrd_full:     mean:adjective + onestdev:mean + (1 | turker)
-                             Df    AIC    BIC  logLik deviance  Chisq
-modelrd_full_minus_stdevAdj 200 5288.4 6511.9 -2444.2   4888.4       
-modelrd_full                297 5332.2 7149.1 -2369.1   4738.2 150.15
-                            Chi Df Pr(>Chisq)    
-modelrd_full_minus_stdevAdj                      
-modelrd_full                    97  0.0004385 ***
+                             Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)    
+modelrd_full_minus_stdevAdj 200 5236.3 6458.2 -2418.2   4836.3                             
+modelrd_full                297 5281.4 7095.9 -2343.7   4687.4 148.92     97  0.0005553 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+#-----------------------------------------
+# LogRespDev model
+#-----------------------------------------
+
+
+> modelrd_log_full = lmer(logrespdev ~ adjective
++                                   + mean + onestdev + onestdev:adjective
++                                   + mean:adjective + mean:onestdev
++                                   +(1|turker), # random slope(right?) for each turk respondent
++                                   data = rd4, REML = F)		
+Warning message:
+Some predictor variables are on very different scales: consider rescaling 
+> plot(modelrd_log_full, main="Residuals for Full Model", width=4, height=4)
+> anova(modelrd_log_full, modelrd_log_full_minus_stdevMean)
+Data: rd4
+Models:
+modelrd_log_full_minus_stdevMean: logrespdev ~ adjective + onestdev + mean + onestdev:adjective + 
+modelrd_log_full_minus_stdevMean:     mean:adjective + (1 | turker)
+modelrd_log_full: logrespdev ~ adjective + mean + onestdev + onestdev:adjective + 
+modelrd_log_full:     mean:adjective + mean:onestdev + (1 | turker)
+                                  Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)
+modelrd_log_full_minus_stdevMean 296 7521.4 9328.3 -3464.7   6929.4                         
+modelrd_log_full                 297 7521.9 9334.9 -3464.0   6927.9 1.4534      1      0.228
+> modelrd_log_full_minus_stdevMean_minus_meanAdj = lmer(logrespdev ~ adjective
++ + onestdev
++ + mean
++ + onestdev:adjective
++ #+ mean:adjective
++ #+ onestdev:mean
++ +(1|turker), # random slope(right?) for each turk respondent
++ data = rd4, REML = F)
+Warning message:
+Some predictor variables are on very different scales: consider rescaling 
+> #anova(modelrd_log_full, modelrd_log_full_minus_stdevMean)
+> anova(modelrd_log_full_minus_stdevMean_minus_meanAdj, modelrd_log_full_minus_stdevMean)
+Data: rd4
+Models:
+modelrd_log_full_minus_stdevMean_minus_meanAdj: logrespdev ~ adjective + onestdev + mean + onestdev:adjective + 
+modelrd_log_full_minus_stdevMean_minus_meanAdj:     (1 | turker)
+modelrd_log_full_minus_stdevMean: logrespdev ~ adjective + onestdev + mean + onestdev:adjective + 
+modelrd_log_full_minus_stdevMean:     mean:adjective + (1 | turker)
+                                                Df    AIC    BIC  logLik deviance  Chisq Chi Df
+modelrd_log_full_minus_stdevMean_minus_meanAdj 199 7452.1 8666.9 -3527.0   7054.1              
+modelrd_log_full_minus_stdevMean               296 7521.4 9328.3 -3464.7   6929.4 124.69     97
+                                               Pr(>Chisq)  
+modelrd_log_full_minus_stdevMean_minus_meanAdj             
+modelrd_log_full_minus_stdevMean                  0.03058 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> modelrd_log_full_minus_stdevMean_minus_stdevAdj = lmer(logrespdev ~ adjective
++ + onestdev
++ + mean
++ #+ onestdev:adjective
++ + mean:adjective
++ #+ onestdev:mean
++ +(1|turker), # random slope(right?) for each turk respondent
++ data = rd4, REML = F)
+Warning message:
+Some predictor variables are on very different scales: consider rescaling 
+> #anova(modelrd_log_full, modelrd_log_full_minus_stdevMean)
+> anova(modelrd_log_full_minus_stdevMean_minus_stdevAdj, modelrd_log_full_minus_stdevMean)
+Data: rd4
+Models:
+modelrd_log_full_minus_stdevMean_minus_stdevAdj: logrespdev ~ adjective + onestdev + mean + mean:adjective + (1 | 
+modelrd_log_full_minus_stdevMean_minus_stdevAdj:     turker)
+modelrd_log_full_minus_stdevMean: logrespdev ~ adjective + onestdev + mean + onestdev:adjective + 
+modelrd_log_full_minus_stdevMean:     mean:adjective + (1 | turker)
+                                                 Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)    
+modelrd_log_full_minus_stdevMean_minus_stdevAdj 199 7485.8 8700.6 -3543.9   7087.8                             
+modelrd_log_full_minus_stdevMean                296 7521.4 9328.3 -3464.7   6929.4 158.44     97  8.272e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> r.squaredGLMM(modelrd_log_full)
+      R2m       R2c 
+0.6466410 0.6952482
 
 
 
@@ -474,6 +584,15 @@ Resampling results:
 Tuning parameter 'intercept' was held constant at a value of TRUE
 ################
 
+‘
+
+
+
+
+
+
+
+
 
 
 #-----------------------------------------
@@ -496,55 +615,7 @@ p + geom_boxplot(aes(group = cut_width(onestdev, 1)), outlier.alpha = 0.1) + ggt
 #-----------------------------------------
 # CV function
 #-----------------------------------------
-my_lme_cv <- function(dt) {
-	nrow(dt)
-	dt$i = 1:nrow(dt)
-	ym = mean(dt$respdev)
-	PRESS = 0
-	SD = 0
-	for (heldout in 1:nrow(dt)){
-		train <- subset(dt, dt$i != heldout)
-		test  <- subset(dt, dt$i == heldout)
 
-		modelcv_train = lmer(respdev ~ adjective
-  		 	+ mean
-	 		+ onestdev
-             		+(1|turker), # random slope(right?) for each turk respondent
-             		data = train, REML = F)		
-
-		predictions_test = predict(modelcv_train, test)
-		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
-		PRESS = PRESS + curr_sqerr
-		SD = SD + ((sum(test$respdev) - ym)^2)
-	}
-	1-(PRESS/SD)	
-	
-}
-my_lme_cv <- function(dt) {
-	nrow(dt)
-	dt$i = 1:nrow(dt)
-	ym = mean(dt$respdev)
-	PRESS = 0
-	SD = 0
-	for (heldout in 1:nrow(dt)){
-		i
-		train <- subset(dt, dt$i != heldout)
-		test  <- subset(dt, dt$i == heldout)
-
-		modelcv_train = lmer(respdev ~ adjective
-  		 	+ mean
-	 		+ onestdev
-             		+(1|turker), # random slope(right?) for each turk respondent
-             		data = train, REML = F)		
-
-		predictions_test = predict(modelcv_train, test)
-		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
-		PRESS = PRESS + curr_sqerr
-		SD = SD + ((sum(test$respdev) - ym)^2)
-	}
-	1-(PRESS/SD)	
-	
-}
 
 
 my_lme_cv <- function(dt) {
@@ -557,28 +628,93 @@ my_lme_cv <- function(dt) {
 	for (heldout in 1:nrow(dt)){
 		cat("Working on heldout = ")
   	cat(heldout)
-    cat("\n")
+    	cat("\n")
 		train <- subset(dt, dt$i != heldout)
 		test  <- subset(dt, dt$i == heldout)
-
+	
 		modelcv_train = lmer(respdev ~ adjective
   		 	+ mean
 	 		+ onestdev
+			+ mean:adjective + onestdev:adjective + mean:onestdev
              		+(1|turker), # random slope(right?) for each turk respondent
              		data = train, REML = F)		
 
 		predictions_test = predict(modelcv_train, test)
 		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
 		PRESS = PRESS + curr_sqerr
-		SD = SD + ((sum(test$respdev) - ym)^2)
+		SD = SD + sum((test$respdev - ym)^2)
 	}
 	cat("Predictive R^2 using LOOCV with lmer:")
-	cat("    respdev ~ adjective + mean + stdev + (1|turker) ")
+	cat("    respdev ~ adjective + mean + stdev + adj:mean + adj:stdev + mean:stdev (1|turker) ")
 	
 	1-(PRESS/SD)	
 	
 }
 
+my_lme_cv_log <- function(dt) {
+	library(lme4)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$logrespdev)
+	PRESS = 0
+	SD = 0
+  
+	for (heldout in 1:nrow(dt)){
+		cat("Working on heldout = ")
+  	cat(heldout)
+    	cat("\n")
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+	
+		modelcv_train = lmer(logrespdev ~ adjective
+  		 	+ mean
+	 		+ onestdev
+			+ mean:adjective + onestdev:adjective 
+             		+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$logrespdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + sum((test$logrespdev - ym)^2)
+	}
+	cat("Predictive R^2 using LOOCV with lmer:")
+	cat("    logrespdev ~ adjective + mean + stdev + adj:mean + adj:stdev  (1|turker) ")
+	
+	1-(PRESS/SD)	
+	
+}
+
+my_lme_cv_backoff <- function(dt) {
+	library(lme4)
+	dt$i = 1:nrow(dt)
+	ym = mean(dt$respdev)
+	PRESS = 0
+	SD = 0
+  
+	for (heldout in 1:nrow(dt)){
+		cat("Working on heldout = ")
+  	cat(heldout)
+    	cat("\n")
+		train <- subset(dt, dt$i != heldout)
+		test  <- subset(dt, dt$i == heldout)
+
+		modelcv_train = lmer(respdev ~ adjective
+  		 	+ mean
+	 		+ mean:adjective
+			+(1|turker), # random slope(right?) for each turk respondent
+             		data = train, REML = F)		
+
+		predictions_test = predict(modelcv_train, test)
+		curr_sqerr = sum(( test$respdev - predict(modelcv_train, test))^2)
+		PRESS = PRESS + curr_sqerr
+		SD = SD + sum((test$respdev - ym)^2)
+	}
+	cat("Predictive R^2 using LOOCV with lmer:")
+	cat("    respdev ~ adjective + mean + mean:adjective + (1|turker) ")
+	
+	1-(PRESS/SD)	
+	
+}
 
 #-----------------------------------------
 # Outlier removal function
