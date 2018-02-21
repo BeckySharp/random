@@ -309,9 +309,25 @@ rd2 = subset(rd2, rd2$turker != "T_9884243")#    2
 nrow(rd2)
 # [1] 3326
 
+#-----------------------------------------
+# Make rd4 —> with logRespDev
+#-----------------------------------------
+rd2$logrespdev = log(rd2$respdev + .Machine$double.eps)
+rd4 = subset(rd2, rd2$respdev > 0)
 
 #-----------------------------------------
-# Basic Model
+# Make rd4_highfreq_30 
+#-----------------------------------------
+
+rd4_highfreq_30 = subset(rd4, rd4$adjective %in% c( "good", "major", "high", "little", "big", "great", "clear", "small", "important", "strong", "likely", "large", "firm", "low", "serious", "light", "poor", "huge", "sound", "significant", "powerful", "positive", "fine", "conservative", "grand", "deep", "traditional", "wide", "critical", "regular" ))
+
+# Remove the turkers that only had 1 response for purposes of cross-validation:
+rd4_highfreq_30_no1 = subset(rd4_highfreq_30, rd4_highfreq_30$turker != "T_7742505")
+rd4_highfreq_30_no1 = subset(rd4_highfreq_30_no1, rd4_highfreq_30_no1$turker != "T_8960927")
+
+
+#-----------------------------------------
+# Original/Full Model
 #-----------------------------------------
 
 modelrd_full = lmer(respdev ~ adjective
@@ -496,118 +512,87 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
       R2m       R2c 
 0.6466410 0.6952482
 Predictive R^2 using LOOCV with lmer:    logrespdev ~ adjective + mean + stdev + adj:mean + adj:stdev  (1|turker) [1] 0.6149629
+
 Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + adj:mean + (1|turker) [1] 0.6024396
+
+> r.squaredGLMM(modelrd_backoff_log_minusInteraction)
+      R2m       R2c 
+0.6023951 0.6518720
 Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + (1|turker) [1] 0.6139743
 
 
-#——————————————————
 
+#-----------------------------------------
+# BASIC MODEL:
+#-----------------------------------------
 
-##BACKOFF!!###
-
-> anova(modelrd_backoff_full_log, modelrd_backoff_log_minusInteraction)
+> anova(modelrd_basic_full_log, modelrd_basic_full_log_minusInteraction)
 Data: rd4
 Models:
-modelrd_backoff_log_minusInteraction: logrespdev ~ adjective + mean + (1 | turker)
-modelrd_backoff_full_log: logrespdev ~ adjective + mean + mean:adjective + (1 | turker)
-                                      Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)
-modelrd_backoff_log_minusInteraction 101 7557.1 8173.6 -3677.6   7355.1                         
-modelrd_backoff_full_log             198 7643.5 8852.2 -3623.8   7247.5 107.58     97     0.2173
+modelrd_basic_full_log_minusInteraction: logrespdev ~ adjective + mean + onestdev + (1 | turker)
+modelrd_basic_full_log: logrespdev ~ adjective + mean + onestdev + mean:onestdev + (1 | 
+modelrd_basic_full_log:     turker)
+                                         Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)
+modelrd_basic_full_log_minusInteraction 102 7407.6 8030.3 -3601.8   7203.6                         
+modelrd_basic_full_log                  103 7407.7 8036.4 -3600.8   7201.7 1.9824      1     0.1591
+> 
 
 
-#-----------------------------------------
-# Cross-Validate model
-#-----------------------------------------
+> anova(modelrd_basic_full_log_minusInteraction_minus_mean, modelrd_basic_full_log_minusInteraction)
+Data: rd4
+Models:
+modelrd_basic_full_log_minusInteraction_minus_mean: logrespdev ~ adjective + onestdev + (1 | turker)
+modelrd_basic_full_log_minusInteraction: logrespdev ~ adjective + mean + onestdev + (1 | turker)
+                                                    Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)  
+modelrd_basic_full_log_minusInteraction_minus_mean 101 7411.2 8027.8 -3604.6   7209.2                           
+modelrd_basic_full_log_minusInteraction            102 7407.6 8030.3 -3601.8   7203.6 5.5869      1    0.01809 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-set.seed(101)
-sample <- sample.int(n = nrow(rd2), size = floor(.75*nrow(rd2)), replace = F)
-train_rd <- rd2[sample, ]
-test_rd  <- rd2[-sample, ]
 
-modelrd_train = lmer(respdev ~ adjective
-			 + mean
-			 + onestdev
-             +(1|turker), # random slope(right?) for each turk respondent
-             data = train_rd, REML = F)		
-modelrd_train
-summary(modelrd_train)
 
-r.squaredGLMM(modelrd_train)
-*****************************
+> anova(modelrd_basic_full_log_minusInteraction_minus_stdev, modelrd_basic_full_log_minusInteraction)
+Data: rd4
+Models:
+modelrd_basic_full_log_minusInteraction_minus_stdev: logrespdev ~ adjective + mean + (1 | turker)
+modelrd_basic_full_log_minusInteraction: logrespdev ~ adjective + mean + onestdev + (1 | turker)
+                                                     Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(>Chisq)    
+modelrd_basic_full_log_minusInteraction_minus_stdev 101 7557.1 8173.6 -3677.6   7355.1                             
+modelrd_basic_full_log_minusInteraction             102 7407.6 8030.3 -3601.8   7203.6 151.46      1  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+#=========================================================================
+## PAPER #####============================================================
+#=========================================================================
+
+> r.squaredGLMM(modelrd_basic_full_log_minusInteraction)
       R2m       R2c 
-0.6018689 0.6993606 
-*****************************
+0.6177985 0.6695360
+Predictive R^2 using LOOCV with lmer (BASIC!):    logrespdev ~ adjective + mean + onestdev + (1|turker) [1] 0.6319083
 
-predictions_rd_test = predict(modelrd_train, test_rd)
+#=========================================================================
+> r.squaredGLMM(modelrd_backoff_log_minusInteraction)
+      R2m       R2c 
+0.6023951 0.6518720
+Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + (1|turker) [1] 0.6139743
 
-my_rsq(predictions_rd_test, test_rd$respdev)
-## This is only a pseudo-R^2
-*****************************
-[1] 0.7007994
-*****************************
+#=========================================================================
+## HIGH FREQ 30 no 1 =====================================================
+#=========================================================================
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## TOP 30 no 1
+      R2m       R2c 
+0.6718257 0.7247892
+Predictive R^2 using LOOCV with lmer (BASIC!):    logrespdev ~ adjective + mean + onestdev + (1|turker) [1] 0.6774839
+#=========================================================================
+> r.squaredGLMM(modelrd_basic_highfreq_30_no1_full_log_minusInteraction_backoff)
+      R2m       R2c 
+0.6521512 0.7038420
+Predictive R^2 using LOOCV with lmer (BACKOFF!):    logrespdev ~ adjective + mean + (1|turker) [1] 0.6557806
 
-# rmse from Metrics package:
-
-# RMSE for training
->rmse(rd2$respdev, predict(modelrd, rd2))
-#[1] 0.4671313
-
-# RMSE for testing
-> rmse(test_rd$respdev, predict(modelrd_train, test_rd))
-#[1] 0.5218621
-
-## Predictive R2:
-# Predicted squared error (PSE):
-PSE = sum((test_rd$respdev - predictions_rd_test)^2) / nrow(test_rd)
-# [1] 0.27234
-
-SStot = sum((mean(rd2$respdev) - test_rd$respdev)^2) / nrow(test_rd)
-#[1] 0.888911
-
-1 - (PSE/SStot)
-#Predictive R2 = [1] 0.6936251
-
-> my_lme_cv(rd2)
-Loading required package: Matrix
-[1] 0.6775378
-
-
-## As a lm instead, using caret package LOOCV
-> train_control <- trainControl(method="LOOCV")
-> # train the model
-> model <- train(
-+     respdev ~ adjective
-+     + mean
-+     + onestdev
-+     #+(1|turker)
-+     , data=rd2, trControl=train_control, method="lm")
-There were 50 or more warnings (use warnings() to see the first 50)
-> # summarize results
-> print(model)
-Linear Regression 
-
-367 samples
-  3 predictor
-
-No pre-processing
-Resampling: Leave-One-Out Cross-Validation 
-Summary of sample sizes: 366, 366, 366, 366, 366, 366, ... 
-Resampling results:
-
-  RMSE       Rsquared   MAE     
-  0.5553423  0.5981039  0.379189
-
-Tuning parameter 'intercept' was held constant at a value of TRUE
-################
-
-‘
-
-
-
-
-
+#==========================================================================
 
 
 
@@ -628,7 +613,15 @@ p + geom_boxplot(outlier.alpha = 0.1)  + ggtitle("Standardized Response by Adjec
 
 p + geom_boxplot(aes(group = cut_width(mean, 1)), outlier.alpha = 0.1) + geom_jitter(aes(group = cut_width(mean, 1)), width = 0.05) + ggtitle("Standardized Response by Adjective and PromptMean")
 
-p + geom_boxplot(aes(group = cut_width(onestdev, 1)), outlier.alpha = 0.1) + ggtitle("Standardized Response by Adjective and PromptStdDeviation")
+p + geom_boxplot(aes(group = cut_width(onestdev, 1)), outlier.alpha = 0.1) + ggtitle("Standardized Response by Adjective and PromptStdDeviation") 
+
+
+## PAPER ##
+p2 <- ggplot(rd2_subset, aes(adjective, respdev))
+p2 + geom_boxplot(outlier.alpha = 0.1) + geom_jitter(width = 0.1) + ggtitle("Magnitude of Perceived Increase by Adjective") + ylab("n Standard Deviations (respDev)") + xlab("") + theme(axis.title=element_text(size=24), axis.text.x = element_text(angle = 45, hjust = 1), axis.text=element_text(size=24), plot.title=element_text(size=30))
+
+
+
 
 #-----------------------------------------
 # CV function
